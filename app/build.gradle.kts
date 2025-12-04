@@ -76,4 +76,10 @@ dependencies {
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    //Logger
+
+    implementation("org.slf4j:slf4j-simple:2.0.9")
+
+
 }

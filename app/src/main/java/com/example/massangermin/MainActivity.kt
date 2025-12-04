@@ -39,8 +39,8 @@ fun main() = runBlocking {
 
     // 1. INSERT
     val row = YourRow(
-        id = "test125",
-        text = "Podnyal s kolen!"
+        id = "test129",
+        text = "Nikita lox"
     )
 
     println("Inserting row...")
