@@ -3,62 +3,77 @@ package com.example.massangermin
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.massangermin.data.model.UserState
 import com.example.massangermin.ui.theme.MassangerMINTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.postgrest
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.Serializable
+class MainActivity : ComponentActivity() {
 
-@Serializable
-data class YourRow(
-    val id: String,
-    val text: String
-)
+    private val viewModel: SupabaseViewModel by viewModels()
 
-object SupabaseHolder {
-    val client = createSupabaseClient(
-        supabaseUrl = "https://mizaoohsfkarcdppgxww.supabase.co",
-        supabaseKey = "sb_secret_-nu44rz729IsGR-1cCxNeg_5n7QV2yS"
-    ) {
-        install(Postgrest)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Создаём scope для realtime
+        val realtimeScope = CoroutineScope(Dispatchers.IO)
+        viewModel.realtimeDb(realtimeScope)
+
+        setContent {
+            MassangerMINTheme {
+                TestScreen(viewModel)
+            }
+        }
     }
 }
 
-fun main() = runBlocking {
-    println("=== Supabase Test Start ===")
+@Composable
+fun TestScreen(viewModel: SupabaseViewModel) {
+    val state by viewModel.userState
 
-    // 1. INSERT
-    val row = YourRow(
-        id = "test129",
-        text = "Nikita lox"
-    )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
 
-    println("Inserting row...")
-    SupabaseHolder.client.postgrest["testtable"]
-        .insert(row)
+        Text("Supabase Test", style = MaterialTheme.typography.titleLarge)
 
-    println("Insert OK")
+        // кнопки для CRUD
+        Button(onClick = { viewModel.saveNote() }) {
+            Text("Insert Note")
+        }
 
-    // 2. SELECT
-    println("Reading rows...")
-    val rows = SupabaseHolder.client.postgrest["testtable"]
-        .select()
-        .decodeList<YourRow>()
+        Button(onClick = { viewModel.getNote() }) {
+            Text("Get Note")
+        }
 
-    println("Rows in table:")
-    for (r in rows) {
-        println("id=${r.id}, text=${r.text}")
+        Button(onClick = { viewModel.updateNote() }) {
+            Text("Update Note")
+        }
+
+        Button(onClick = { viewModel.deleteFirstNote() }) {
+            Text("Delete Note")
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text("STATE:")
+        Text(
+            text = when (state) {
+                is UserState.Loading -> "Loading..."
+                is UserState.Success -> (state as UserState.Success).message
+                is UserState.Error -> "Error: ${(state as UserState.Error).message}"
+            },
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
-
-    println("=== Supabase Test Finished ===")
 }
