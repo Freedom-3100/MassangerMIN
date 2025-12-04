@@ -13,35 +13,52 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.massangermin.ui.theme.MassangerMINTheme
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            MassangerMINTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class YourRow(
+    val id: String,
+    val text: String
+)
+
+object SupabaseHolder {
+    val client = createSupabaseClient(
+        supabaseUrl = "https://mizaoohsfkarcdppgxww.supabase.co",
+        supabaseKey = "sb_secret_-nu44rz729IsGR-1cCxNeg_5n7QV2yS"
+    ) {
+        install(Postgrest)
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
+fun main() = runBlocking {
+    println("=== Supabase Test Start ===")
+
+    // 1. INSERT
+    val row = YourRow(
+        id = "test125",
+        text = "Podnyal s kolen!"
     )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MassangerMINTheme {
-        Greeting("Android")
+    println("Inserting row...")
+    SupabaseHolder.client.postgrest["testtable"]
+        .insert(row)
+
+    println("Insert OK")
+
+    // 2. SELECT
+    println("Reading rows...")
+    val rows = SupabaseHolder.client.postgrest["testtable"]
+        .select()
+        .decodeList<YourRow>()
+
+    println("Rows in table:")
+    for (r in rows) {
+        println("id=${r.id}, text=${r.text}")
     }
+
+    println("=== Supabase Test Finished ===")
 }
