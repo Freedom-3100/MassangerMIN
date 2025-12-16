@@ -18,6 +18,7 @@ plugins {
 }
 
 hilt {
+    // This is often used to resolve compatibility issues with KSP.
     enableAggregatingTask = false
 }
 
@@ -37,6 +38,13 @@ android {
 
         buildConfigField("String", "SUPABASE_KEY", "\"$key\"")
         buildConfigField("String", "SUPABASE_URL", "\"$url\"")
+    }
+
+    // Packaging options to prevent duplicate file errors from Ktor/other libs.
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 
     compileOptions {
@@ -66,40 +74,35 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.compose.material:material-icons-core")
     implementation("androidx.compose.material:material-icons-extended")
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-
-    // Firebase
-    implementation(libs.firebase.firestore.ktx)
-    implementation(libs.protolite.well.known.types)
-
-    // Hilt
+    // Hilt (Dependency Injection)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
-    // Supabase v3
-    implementation(libs.supabase.auth)
-    implementation(libs.supabase.postgrest)
-    implementation(libs.supabase.storage)
-    implementation(libs.supabase.realtime)
-    // Coroutines
+    // Supabase (Using stable Bill of Materials - BOM)
+    implementation(platform("io.github.jan-tennert.supabase:bom:2.5.0"))
+    implementation("io.github.jan-tennert.supabase:gotrue-kt") // Correct artifact for auth
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:realtime-kt")
+    implementation("io.github.jan-tennert.supabase:storage-kt")
+
+
+    // Ktor - BOM is needed to specify versions for ktor clients
+    implementation(platform("io.ktor:ktor-bom:2.3.12"))
+    implementation("io.ktor:ktor-client-okhttp")
+
+    // Coroutines & Serialization
     implementation(libs.kotlinx.coroutines.android)
-
-    // Ktor
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.android)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.client.websockets)
-    implementation("io.ktor:ktor-client-okhttp:3.3.0")
-
-    // Serialization
     implementation(libs.kotlinx.serialization.json)
+
+    // Firebase (You can remove these if you are only using Supabase)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.protolite.well.known.types)
 
     // Tests
     testImplementation(libs.junit)

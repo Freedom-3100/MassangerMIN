@@ -3,7 +3,6 @@ package com.example.massangermin.domain.usecase
 import com.example.massangermin.data.model.UserState
 import com.example.massangermin.domain.AuthRepository
 import com.example.massangermin.domain.AuthUseCase
-import com.example.massangermin.domain.MessageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,8 +11,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthUseCaseImpl @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val messageRepository: MessageRepository
+    private val authRepository: AuthRepository
 ) : AuthUseCase {
 
     private val _userState = MutableStateFlow<UserState>(UserState.Idle)
@@ -44,17 +42,6 @@ class AuthUseCaseImpl @Inject constructor(
             // Обновляем состояние
             _userState.value = UserState.Success("Вход успешен!")
 
-            // Загружаем сообщения
-            try {
-                messageRepository.loadMessages()
-            } catch (e: Exception) {
-                // Логируем ошибку, но не прерываем процесс
-                println("Ошибка загрузки сообщений: ${e.message}")
-            }
-
-            // Подключаем realtime
-            messageRepository.connectRealtime()
-
         } catch (e: Exception) {
             _userState.value = UserState.Error("Ошибка входа: ${e.message ?: "Неизвестная ошибка"}")
         }
@@ -62,9 +49,6 @@ class AuthUseCaseImpl @Inject constructor(
 
     override suspend fun signOut() {
         try {
-            // Отключаем realtime
-            messageRepository.disconnectRealtime()
-
             // Выходим из аккаунта
             authRepository.signOut()
 

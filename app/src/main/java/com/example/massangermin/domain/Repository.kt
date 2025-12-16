@@ -2,7 +2,7 @@ package com.example.massangermin.domain
 
 import com.example.massangermin.data.model.ChatMessage
 import com.example.massangermin.data.model.UserState
-import io.github.jan.supabase.auth.user.UserInfo
+import io.github.jan.supabase.gotrue.user.UserInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 

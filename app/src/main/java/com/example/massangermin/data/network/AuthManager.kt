@@ -1,8 +1,8 @@
 package com.example.massangermin.data.network
 
 import com.example.massangermin.data.network.SupabaseClientHolder.client
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.providers.builtin.Email
 
 
 object AuthManager {
