@@ -21,14 +21,12 @@ class AuthUseCaseImpl @Inject constructor(
         _userState.value = UserState.Loading
 
         try {
-            // Вызываем регистрацию
             authRepository.signUp(email, password)
 
-            // После успешной регистрации делаем автоматический вход
             signIn(email, password)
 
         } catch (e: Exception) {
-            _userState.value = UserState.Error("Ошибка регистрации: ${e.message ?: "Неизвестная ошибка"}")
+            _userState.value = UserState.Error("Sign up error: ${e.message ?: "Unknown error"}")
         }
     }
 
@@ -36,14 +34,12 @@ class AuthUseCaseImpl @Inject constructor(
         _userState.value = UserState.Loading
 
         try {
-            // Вызываем вход
             authRepository.signIn(email, password)
 
-            // Обновляем состояние
-            _userState.value = UserState.Success("Вход успешен!")
+            _userState.value = UserState.Success("Sign in succeed!")
 
         } catch (e: Exception) {
-            _userState.value = UserState.Error("Ошибка входа: ${e.message ?: "Неизвестная ошибка"}")
+            _userState.value = UserState.Error("Sign in error: ${e.message ?: "Unknown error"}")
         }
     }
 
@@ -53,10 +49,10 @@ class AuthUseCaseImpl @Inject constructor(
             authRepository.signOut()
 
             // Обновляем состояние
-            _userState.value = UserState.Success("Вы вышли")
+            _userState.value = UserState.Success("You signed out.")
 
         } catch (e: Exception) {
-            _userState.value = UserState.Error("Ошибка выхода: ${e.message ?: "Неизвестная ошибка"}")
+            _userState.value = UserState.Error("Sign out error: ${e.message ?: "Unknown error"}")
         }
     }
 

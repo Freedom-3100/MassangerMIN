@@ -1,4 +1,3 @@
-// MessageUseCaseImpl.kt
 package com.example.massangermin.domain.usecase
 
 import com.example.massangermin.data.model.ChatMessage
@@ -20,7 +19,7 @@ class MessageUseCaseImpl @Inject constructor(
             val user = authRepository.getCurrentUser() ?: return
             messageRepository.sendMessage(text, user.id)
         } catch (e: Exception) {
-            println("Ошибка отправки сообщения: ${e.message}")
+            println("Sending message error: ${e.message}")
         }
     }
 
@@ -28,7 +27,7 @@ class MessageUseCaseImpl @Inject constructor(
         try {
             messageRepository.loadMessages()
         } catch (e: Exception) {
-            println("Ошибка загрузки сообщений: ${e.message}")
+            println("Loading messages error: ${e.message}")
         }
     }
 

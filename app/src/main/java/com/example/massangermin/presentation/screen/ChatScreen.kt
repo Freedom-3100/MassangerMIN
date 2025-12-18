@@ -32,20 +32,17 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
     val userState by viewModel.userState.collectAsStateWithLifecycle()
 
-    // Состояние для отображения экрана регистрации
     var showRegister by remember { mutableStateOf(false) }
 
     if (currentUser == null) {
         if (showRegister) {
-            // Показываем RegisterScreen
             RegisterScreen(
-                onNavigateToLogin = { showRegister = false }, // Возвращаемся на LoginScreen
+                onNavigateToLogin = { showRegister = false },
                 viewModel = viewModel
             )
         } else {
-            // Показываем LoginScreen
             LoginScreen(
-                onNavigateToRegister = { showRegister = true }, // Переходим на RegisterScreen
+                onNavigateToRegister = { showRegister = true },
                 viewModel = viewModel,
                 userState = userState
             )
@@ -233,15 +230,9 @@ private fun MessageBubble(message: Message, isMine: Boolean) {
 /* ========================= HELPERS ========================= */
 
 private fun chatTitle(chat: Chat, currentUser: UserInfo?, allUsers: List<User>): String {
-    println("DEBUG: chatTitle called for chat ${chat.id}")
-    println("DEBUG: chat.members = ${chat.members}")
-    println("DEBUG: currentUser?.id = ${currentUser?.id}")
-    println("DEBUG: allUsers size = ${allUsers.size}, first few = ${allUsers.take(5)}")
 
     val currentUserId = currentUser?.id
     val otherMembers = chat.members.filter { it.toString() != currentUserId }
-
-    println("DEBUG: otherMembers = $otherMembers")
 
     return when {
         otherMembers.size == 1 -> {
@@ -249,7 +240,7 @@ private fun chatTitle(chat: Chat, currentUser: UserInfo?, allUsers: List<User>):
                 chat.members.contains(it.id) && it.id.toString() != currentUser?.id
             }
             return if (other != null && other.email != null) {
-                extractNameFromEmail(other.email!!)
+                extractNameFromEmail(other.email)
             } else {
                 "Unknown User"
             }
@@ -258,7 +249,7 @@ private fun chatTitle(chat: Chat, currentUser: UserInfo?, allUsers: List<User>):
             "Group Chat (${otherMembers.size} members)"
         }
         else -> {
-            "No Participants"
+            "Saved Messages"
         }
     }
 }
@@ -271,7 +262,7 @@ private fun extractNameFromEmail(email: String): String {
 
 @Composable
 fun LoginScreen(
-    onNavigateToRegister: () -> Unit, // Функция для перехода на RegisterScreen
+    onNavigateToRegister: () -> Unit,
     viewModel: ChatViewModel,
     userState: UserState
 ) {
@@ -310,16 +301,14 @@ fun LoginScreen(
             Text("Login")
         }
 
-        // Кнопка для перехода на RegisterScreen
         TextButton(onClick = onNavigateToRegister) {
             Text("Don't have an account? Sign Up")
         }
 
-        // Отображение состояния (ошибки/успех)
         when (userState) {
             is UserState.Error -> Text(userState.message ?: "Error", color = MaterialTheme.colorScheme.error)
             is UserState.Success -> Text(userState.message, color = MaterialTheme.colorScheme.primary)
-            else -> {} // Idle/Loading
+            else -> {}
         }
     }
 }
@@ -328,7 +317,7 @@ fun LoginScreen(
 
 @Composable
 fun RegisterScreen(
-    onNavigateToLogin: () -> Unit, // Функция для возврата на LoginScreen
+    onNavigateToLogin: () -> Unit,
     viewModel: ChatViewModel
 ) {
     var email by remember { mutableStateOf("") }
@@ -374,35 +363,28 @@ fun RegisterScreen(
         Button(
             onClick = {
                 if (password == confirmPassword) {
-                    viewModel.signUp(email.trim(), password) // Вызов регистрации из ViewModel
+                    viewModel.signUp(email.trim(), password)
                 }
-                // Иначе можно показать ошибку "Пароли не совпадают"
             },
             enabled = email.isNotBlank() && password.isNotBlank() && password == confirmPassword
         ) {
             Text("Sign Up")
         }
 
-        // Кнопка для возврата на LoginScreen
         TextButton(onClick = onNavigateToLogin) {
             Text("Already have an account? Sign In")
         }
 
-        // Отображение состояния (ошибки/успех) из ViewModel
         when (val state = userState) {
             is UserState.Error -> {
-                // Проверим, относится ли ошибка к регистрации
                 if (state.message?.contains("signUp") == true) {
                     Text(state.message, color = MaterialTheme.colorScheme.error)
                 }
             }
             is UserState.Success -> {
-                // Сообщение об успешной регистрации (или входе после неё)
-                // В реальной жизни, после успешной регистрации, часто сразу делается вход,
-                // и пользователь попадает в приложение. Это уже реализовано в AuthUseCaseImpl.
                 Text(state.message, color = MaterialTheme.colorScheme.primary)
             }
-            else -> {} // Idle/Loading
+            else -> {}
         }
     }
 }
