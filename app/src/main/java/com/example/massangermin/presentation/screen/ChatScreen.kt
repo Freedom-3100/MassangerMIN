@@ -32,8 +32,24 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
     val userState by viewModel.userState.collectAsStateWithLifecycle()
 
+    // Состояние для отображения экрана регистрации
+    var showRegister by remember { mutableStateOf(false) }
+
     if (currentUser == null) {
-        LoginScreen(viewModel, userState)
+        if (showRegister) {
+            // Показываем RegisterScreen
+            RegisterScreen(
+                onNavigateToLogin = { showRegister = false }, // Возвращаемся на LoginScreen
+                viewModel = viewModel
+            )
+        } else {
+            // Показываем LoginScreen
+            LoginScreen(
+                onNavigateToRegister = { showRegister = true }, // Переходим на RegisterScreen
+                viewModel = viewModel,
+                userState = userState
+            )
+        }
     } else {
         ChatHost(viewModel)
     }
@@ -250,10 +266,15 @@ private fun chatTitle(chat: Chat, currentUser: UserInfo?, allUsers: List<User>):
 private fun extractNameFromEmail(email: String): String {
     return email.substringBefore('@').takeIf { it.isNotEmpty() } ?: email
 }
+
 /* ========================= LOGIN ========================= */
 
 @Composable
-fun LoginScreen(viewModel: ChatViewModel, userState: UserState) {
+fun LoginScreen(
+    onNavigateToRegister: () -> Unit, // Функция для перехода на RegisterScreen
+    viewModel: ChatViewModel,
+    userState: UserState
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -267,18 +288,121 @@ fun LoginScreen(viewModel: ChatViewModel, userState: UserState) {
         Text("Login", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(24.dp))
 
-        OutlinedTextField(email, { email = it }, label = { Text("Email") })
-        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
-            password,
-            { password = it },
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") }
+        )
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation()
         )
         Spacer(Modifier.height(24.dp))
 
-        Button(onClick = { viewModel.signIn(email.trim(), password) }) {
+        Button(
+            onClick = { viewModel.signIn(email.trim(), password) },
+            enabled = email.isNotBlank() && password.isNotBlank()
+        ) {
             Text("Login")
+        }
+
+        // Кнопка для перехода на RegisterScreen
+        TextButton(onClick = onNavigateToRegister) {
+            Text("Don't have an account? Sign Up")
+        }
+
+        // Отображение состояния (ошибки/успех)
+        when (userState) {
+            is UserState.Error -> Text(userState.message ?: "Error", color = MaterialTheme.colorScheme.error)
+            is UserState.Success -> Text(userState.message, color = MaterialTheme.colorScheme.primary)
+            else -> {} // Idle/Loading
+        }
+    }
+}
+
+/* ========================= REGISTER ========================= */
+
+@Composable
+fun RegisterScreen(
+    onNavigateToLogin: () -> Unit, // Функция для возврата на LoginScreen
+    viewModel: ChatViewModel
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    val userState by viewModel.userState.collectAsStateWithLifecycle()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("Sign Up", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(Modifier.height(24.dp))
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            isError = userState is UserState.Error && (userState as UserState.Error).message?.contains("signUp") == true
+        )
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            visualTransformation = PasswordVisualTransformation()
+        )
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text("Confirm Password") },
+            visualTransformation = PasswordVisualTransformation()
+        )
+        Spacer(Modifier.height(24.dp))
+
+        Button(
+            onClick = {
+                if (password == confirmPassword) {
+                    viewModel.signUp(email.trim(), password) // Вызов регистрации из ViewModel
+                }
+                // Иначе можно показать ошибку "Пароли не совпадают"
+            },
+            enabled = email.isNotBlank() && password.isNotBlank() && password == confirmPassword
+        ) {
+            Text("Sign Up")
+        }
+
+        // Кнопка для возврата на LoginScreen
+        TextButton(onClick = onNavigateToLogin) {
+            Text("Already have an account? Sign In")
+        }
+
+        // Отображение состояния (ошибки/успех) из ViewModel
+        when (val state = userState) {
+            is UserState.Error -> {
+                // Проверим, относится ли ошибка к регистрации
+                if (state.message?.contains("signUp") == true) {
+                    Text(state.message, color = MaterialTheme.colorScheme.error)
+                }
+            }
+            is UserState.Success -> {
+                // Сообщение об успешной регистрации (или входе после неё)
+                // В реальной жизни, после успешной регистрации, часто сразу делается вход,
+                // и пользователь попадает в приложение. Это уже реализовано в AuthUseCaseImpl.
+                Text(state.message, color = MaterialTheme.colorScheme.primary)
+            }
+            else -> {} // Idle/Loading
         }
     }
 }
