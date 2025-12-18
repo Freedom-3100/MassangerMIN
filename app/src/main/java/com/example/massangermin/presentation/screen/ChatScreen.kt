@@ -83,6 +83,9 @@ private fun ChatListScreen(viewModel: ChatViewModel) {
                     IconButton(onClick = { showCreateChatDialog = true }) {
                         Icon(Icons.Default.Add, contentDescription = "New chat")
                     }
+                    IconButton(onClick = viewModel::signOut) {
+                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
+                    }
                 }
             )
         }
@@ -138,11 +141,6 @@ private fun ChatDialogScreen(viewModel: ChatViewModel, chat: Chat) {
                 navigationIcon = {
                     IconButton(onClick = viewModel::clearSelectedChat) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = viewModel::signOut) {
-                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
                     }
                 }
             )
