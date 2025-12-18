@@ -128,6 +128,8 @@ private fun ChatDialogScreen(viewModel: ChatViewModel, chat: Chat) {
     var text by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
+    var showAddMemberDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.lastIndex)
@@ -141,6 +143,11 @@ private fun ChatDialogScreen(viewModel: ChatViewModel, chat: Chat) {
                 navigationIcon = {
                     IconButton(onClick = viewModel::clearSelectedChat) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showAddMemberDialog = true }) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Member")
                     }
                 }
             )
@@ -170,6 +177,15 @@ private fun ChatDialogScreen(viewModel: ChatViewModel, chat: Chat) {
                 )
             }
         }
+    }
+    if (showAddMemberDialog) {
+        AddMemberDialog(
+            onDismiss = { showAddMemberDialog = false },
+            onAdd = { email ->
+                viewModel.addMemberToChat(chat.id, email)
+                showAddMemberDialog = false
+            }
+        )
     }
 }
 
@@ -223,6 +239,36 @@ private fun MessageBubble(message: Message, isMine: Boolean) {
             )
         }
     }
+}
+
+/* ========================= ADD MEMBER DIALOG ========================= */
+
+@Composable
+fun AddMemberDialog(
+    onDismiss: () -> Unit,
+    onAdd: (String) -> Unit
+) {
+    var email by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add Member") },
+        text = {
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("User email") }
+            )
+        },
+        confirmButton = {
+            Button(enabled = email.isNotBlank(), onClick = { onAdd(email.trim()) }) {
+                Text("Add")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    )
 }
 
 /* ========================= HELPERS ========================= */

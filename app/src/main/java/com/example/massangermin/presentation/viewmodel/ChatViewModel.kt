@@ -159,7 +159,8 @@ class ChatViewModel @Inject constructor(
 
     /* ========================= MEMBERS ========================= */
 
-    fun addFriendToCurrentChat(friendId: UUID) {
+
+    fun addFriendToCurrentChat(friendId: UUID) { // need function to add with email
         val chatId = _selectedChatId.value ?: return
         val chat = _chats.value.firstOrNull { it.id == chatId } ?: return
 
