@@ -55,11 +55,11 @@ class ChatViewModel @Inject constructor(
     /* ========================= INIT ========================= */
 
     init {
-        loadAllUsers()
 
         viewModelScope.launch {
             currentUser.collect { user ->
                 if (user != null) {
+                    loadAllUsers()
                     loadChats()
                 } else {
                     clearState()

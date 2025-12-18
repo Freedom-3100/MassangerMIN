@@ -217,25 +217,39 @@ private fun MessageBubble(message: Message, isMine: Boolean) {
 /* ========================= HELPERS ========================= */
 
 private fun chatTitle(chat: Chat, currentUser: UserInfo?, allUsers: List<User>): String {
+    println("DEBUG: chatTitle called for chat ${chat.id}")
+    println("DEBUG: chat.members = ${chat.members}")
+    println("DEBUG: currentUser?.id = ${currentUser?.id}")
+    println("DEBUG: allUsers size = ${allUsers.size}, first few = ${allUsers.take(5)}")
+
     val currentUserId = currentUser?.id
     val otherMembers = chat.members.filter { it.toString() != currentUserId }
 
+    println("DEBUG: otherMembers = $otherMembers")
+
     return when {
         otherMembers.size == 1 -> {
-            val otherUserId = otherMembers.first()
-            val otherUser = allUsers.firstOrNull { it.id == otherUserId }
-            otherUser?.email ?: "Unknown User"
+            val other = allUsers.firstOrNull {
+                chat.members.contains(it.id) && it.id.toString() != currentUser?.id
+            }
+            return if (other != null && other.email != null) {
+                extractNameFromEmail(other.email!!)
+            } else {
+                "Unknown User"
+            }
         }
         otherMembers.size > 1 -> {
-             val emails = otherMembers.mapNotNull { uid -> allUsers.find { it.id == uid }?.email }
-             emails.joinToString(", ")
+            "Group Chat (${otherMembers.size} members)"
         }
         else -> {
-            "SavedMessages"
+            "No Participants"
         }
     }
 }
 
+private fun extractNameFromEmail(email: String): String {
+    return email.substringBefore('@').takeIf { it.isNotEmpty() } ?: email
+}
 /* ========================= LOGIN ========================= */
 
 @Composable
