@@ -217,12 +217,23 @@ private fun MessageBubble(message: Message, isMine: Boolean) {
 /* ========================= HELPERS ========================= */
 
 private fun chatTitle(chat: Chat, currentUser: UserInfo?, allUsers: List<User>): String {
-    val other = allUsers.firstOrNull {
-        it.id != null &&
-                chat.members.contains(it.id) &&
-                it.id.toString() != currentUser?.id
+    val currentUserId = currentUser?.id
+    val otherMembers = chat.members.filter { it.toString() != currentUserId }
+
+    return when {
+        otherMembers.size == 1 -> {
+            val otherUserId = otherMembers.first()
+            val otherUser = allUsers.firstOrNull { it.id == otherUserId }
+            otherUser?.email ?: "Unknown User"
+        }
+        otherMembers.size > 1 -> {
+             val emails = otherMembers.mapNotNull { uid -> allUsers.find { it.id == uid }?.email }
+             emails.joinToString(", ")
+        }
+        else -> {
+            "SavedMessages"
+        }
     }
-    return other?.email ?: "Saved messages"
 }
 
 /* ========================= LOGIN ========================= */
