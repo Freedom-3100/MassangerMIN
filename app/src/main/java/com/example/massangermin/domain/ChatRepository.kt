@@ -14,7 +14,7 @@
         suspend fun sendMessage(chatId: UUID, sender: UUID, text: String)
         suspend fun getAllUsers(): List<User> // New function
 
-        suspend fun addMemberToChat(chatId: UUID, newMemberId: UUID)
+        suspend fun addMemberToChat(chatId: UUID, email: String)
 
         fun observeMessages(chatId: UUID): Flow<List<Message>>
 

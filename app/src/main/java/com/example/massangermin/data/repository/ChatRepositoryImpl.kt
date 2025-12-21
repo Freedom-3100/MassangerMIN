@@ -99,25 +99,36 @@ class ChatRepositoryImpl @Inject constructor() : ChatRepository {
     }
 
 
-    override suspend fun addMemberToChat(chatId: UUID, newMemberId: UUID) {
-        val chat = SupabaseClientHolder.client
+    override suspend fun addMemberToChat(chatId: UUID, email: String) {
+        val userToAdd = SupabaseClientHolder.client
+            .from("profiles")
+            .select {
+                filter { eq("email", email) }
+            }
+            .decodeSingleOrNull<User>()
+            ?: throw IllegalStateException("User with email $email not found")
+
+        val userToAddId = userToAdd.id
+
+        val currentUserId = SupabaseClientHolder.client.auth.currentUserOrNull()?.id
+            ?: throw IllegalStateException("Not authenticated")
+        if (currentUserId == userToAddId.toString()) {
+            throw IllegalArgumentException("Cannot add yourself to the chat")
+        }
+
+
+        val currentChat = SupabaseClientHolder.client
             .from("chats")
             .select {
-                filter {
-                    eq("id", chatId)
-                }
+                filter { eq("id", chatId) }
             }
             .decodeSingle<Chat>()
 
-        if (chat.members.contains(newMemberId)) return
-
-        val updatedMembers = chat.members + newMemberId
+        val updatedMembers = (currentChat.members + userToAddId).distinct()
 
         SupabaseClientHolder.client
             .from("chats")
-            .update(
-                mapOf("members" to updatedMembers)
-            ) {
+            .update(mapOf("members" to updatedMembers.map { it.toString() })) {
                 filter {
                     eq("id", chatId)
                 }

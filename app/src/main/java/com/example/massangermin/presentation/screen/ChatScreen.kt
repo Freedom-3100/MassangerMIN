@@ -182,7 +182,7 @@ private fun ChatDialogScreen(viewModel: ChatViewModel, chat: Chat) {
         AddMemberDialog(
             onDismiss = { showAddMemberDialog = false },
             onAdd = { email ->
-                viewModel.addMemberToChat(chat.id, email)
+                viewModel.addMemberToChat(email)
                 showAddMemberDialog = false
             }
         )
@@ -244,7 +244,7 @@ private fun MessageBubble(message: Message, isMine: Boolean) {
 /* ========================= ADD MEMBER DIALOG ========================= */
 
 @Composable
-fun AddMemberDialog(
+private fun AddMemberDialog(
     onDismiss: () -> Unit,
     onAdd: (String) -> Unit
 ) {
@@ -305,7 +305,7 @@ private fun extractNameFromEmail(email: String): String {
 /* ========================= LOGIN ========================= */
 
 @Composable
-fun LoginScreen(
+private fun LoginScreen(
     onNavigateToRegister: () -> Unit,
     viewModel: ChatViewModel,
     userState: UserState
@@ -360,7 +360,7 @@ fun LoginScreen(
 /* ========================= REGISTER ========================= */
 
 @Composable
-fun RegisterScreen(
+private fun RegisterScreen(
     onNavigateToLogin: () -> Unit,
     viewModel: ChatViewModel
 ) {
@@ -436,7 +436,7 @@ fun RegisterScreen(
 /* ========================= CREATE CHAT ========================= */
 
 @Composable
-fun CreateChatDialog(
+private fun CreateChatDialog(
     onDismiss: () -> Unit,
     onCreate: (String) -> Unit
 ) {

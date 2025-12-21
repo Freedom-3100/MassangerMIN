@@ -159,19 +159,16 @@ class ChatViewModel @Inject constructor(
 
     /* ========================= MEMBERS ========================= */
 
-
-    fun addFriendToCurrentChat(friendId: UUID) { // need function to add with email
+    fun addMemberToChat(friendEmail: String) {
         val chatId = _selectedChatId.value ?: return
-        val chat = _chats.value.firstOrNull { it.id == chatId } ?: return
 
         viewModelScope.launch {
             try {
-                chatRepository.addMemberToChat(chatId, friendId)
-                _chats.value = _chats.value.map {
-                    if (it.id == chatId) it.copy(members = it.members + friendId) else it
-                }
+                chatRepository.addMemberToChat(chatId, friendEmail)
+
+                loadChats()
             } catch (e: Exception) {
-                Log.e("ChatVM", "addFriend error", e)
+                Log.e("ChatVM", "addMemberToChat error", e)
             }
         }
     }
