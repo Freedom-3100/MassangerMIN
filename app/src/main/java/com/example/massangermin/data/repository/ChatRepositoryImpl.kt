@@ -1,7 +1,6 @@
 package com.example.massangermin.data.repository
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.massangermin.data.model.Chat
 import com.example.massangermin.data.model.Message
@@ -101,74 +100,39 @@ class ChatRepositoryImpl @Inject constructor() : ChatRepository {
 
 
     override suspend fun addMemberToChat(chatId: UUID, email: String) {
-        Log.d("ChatRepo", "addMemberToChat: Trying to add user with email '$email' to chat '$chatId'")
-
-        // 1. Найти UUID пользователя по email
-        Log.d("ChatRepo", "addMemberToChat: Fetching user with email '$email' from profiles table")
         val userToAdd = SupabaseClientHolder.client
             .from("profiles")
             .select {
                 filter { eq("email", email) }
             }
             .decodeSingleOrNull<User>()
-            ?: run {
-                Log.e("ChatRepo", "addMemberToChat: User with email '$email' not found")
-                throw IllegalStateException("User with email $email not found")
-            }
+            ?: throw IllegalStateException("User with email $email not found")
 
         val userToAddId = userToAdd.id
-        Log.d("ChatRepo", "addMemberToChat: Found user ID '$userToAddId' for email '$email'")
 
-        // 2. Проверить, не является ли пользователь самим собой
         val currentUserId = SupabaseClientHolder.client.auth.currentUserOrNull()?.id
-            ?: run {
-                Log.e("ChatRepo", "addMemberToChat: No authenticated user found")
-                throw IllegalStateException("Not authenticated")
-            }
+            ?: throw IllegalStateException("Not authenticated")
         if (currentUserId == userToAddId.toString()) {
-            Log.e("ChatRepo", "addMemberToChat: Cannot add user to chat - user is the current user")
             throw IllegalArgumentException("Cannot add yourself to the chat")
         }
 
-        // 3. Получить текущий чат
-        Log.d("ChatRepo", "addMemberToChat: Fetching current chat with ID '$chatId'")
+
         val currentChat = SupabaseClientHolder.client
             .from("chats")
             .select {
                 filter { eq("id", chatId) }
             }
             .decodeSingle<Chat>()
-        Log.d("ChatRepo", "addMemberToChat: Current chat members before update: ${currentChat.members}")
 
-        // 4. Обновить список members, добавив нового участника
         val updatedMembers = (currentChat.members + userToAddId).distinct()
-        Log.d("ChatRepo", "addMemberToChat: Calculated updated members list: $updatedMembers")
 
-        // 5. Сохранить обновлённый чат
-        Log.d("ChatRepo", "addMemberToChat: Attempting to update chat '$chatId' with new members list")
         SupabaseClientHolder.client
             .from("chats")
             .update(mapOf("members" to updatedMembers.map { it.toString() })) {
-            filter { eq("id", chatId) }
+                filter {
+                    eq("id", chatId)
+                }
             }
-
-        Log.d("ChatRepo", "addMemberToChat: Update request sent successfully for chat '$chatId'")
-
-        // --- ДОПОЛНИТЕЛЬНО: Проверим результат обновления ---
-        Log.d("ChatRepo", "addMemberToChat: Verifying update by fetching chat again")
-        val updatedChat = SupabaseClientHolder.client
-            .from("chats")
-            .select {
-                filter { eq("id", chatId) }
-            }
-            .decodeSingle<Chat>()
-        Log.d("ChatRepo", "addMemberToChat: Chat members after update: ${updatedChat.members}")
-
-        if (updatedChat.members.contains(userToAddId)) {
-            Log.d("ChatRepo", "addMemberToChat: SUCCESS - User '$userToAddId' was added to chat '$chatId'")
-        } else {
-            Log.e("ChatRepo", "addMemberToChat: FAILURE - User '$userToAddId' was NOT found in chat '$chatId' after update")
-        }
     }
 
     override fun observeMessages(chatId: UUID): Flow<List<Message>> = flow {
