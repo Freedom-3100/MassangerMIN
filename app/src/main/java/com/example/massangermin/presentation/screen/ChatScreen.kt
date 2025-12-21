@@ -290,7 +290,11 @@ private fun chatTitle(chat: Chat, currentUser: UserInfo?, allUsers: List<User>):
             }
         }
         otherMembers.size > 1 -> {
-            "Group Chat (${otherMembers.size} members)"
+            val otherUserEmails = otherMembers.mapNotNull { uid ->
+                allUsers.find { it.id == uid }?.email
+            }
+            val otherUserNames = otherUserEmails.map { extractNameFromEmail(it) }
+            otherUserNames.joinToString(", ")
         }
         else -> {
             "Saved Messages"
