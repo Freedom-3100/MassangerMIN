@@ -19,7 +19,7 @@ class MessageUseCaseImpl @Inject constructor(
             val user = authRepository.getCurrentUser() ?: return
             messageRepository.sendMessage(text, user.id)
         } catch (e: Exception) {
-            println("Sending message error: ${e.message}")
+            println("Ошибка отправки сообщения: ${e.message}")
         }
     }
 
@@ -27,7 +27,7 @@ class MessageUseCaseImpl @Inject constructor(
         try {
             messageRepository.loadMessages()
         } catch (e: Exception) {
-            println("Loading messages error: ${e.message}")
+            println("Ошибка загрузки сообщений: ${e.message}")
         }
     }
 

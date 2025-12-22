@@ -102,14 +102,14 @@ class ChatRepositoryImpl @Inject constructor() : ChatRepository {
                 filter { eq("email", email) }
             }
             .decodeSingleOrNull<User>()
-            ?: throw IllegalStateException("User with email $email not found")
+            ?: throw IllegalStateException("Пользователь с адресом $email не найден.")
 
         val userToAddId = userToAdd.id
 
         val currentUserId = SupabaseClientHolder.client.auth.currentUserOrNull()?.id
-            ?: throw IllegalStateException("Not authenticated")
+            ?: throw IllegalStateException("Не аутентифицирован.")
         if (currentUserId == userToAddId.toString()) {
-            throw IllegalArgumentException("Cannot add yourself to the chat")
+            throw IllegalArgumentException("Нельзя добавить самого себя в чат.")
         }
 
 
@@ -155,18 +155,18 @@ class ChatRepositoryImpl @Inject constructor() : ChatRepository {
                 filter { eq("email", email) }
             }
             .decodeSingleOrNull<User>()
-            ?: throw IllegalStateException("Пользователь не найден")
+            ?: throw IllegalStateException("Пользователь не найден.")
 
         val currentUserId = SupabaseClientHolder.client
             .auth
             .currentUserOrNull()
             ?.id
-            ?: throw IllegalStateException("Не авторизован")
+            ?: throw IllegalStateException("Не авторизован.")
 
         val myUuid = UUID.fromString(currentUserId)
 
         if (myUuid == otherUser.id) {
-            throw IllegalArgumentException("Нельзя создать чат с собой")
+            throw IllegalArgumentException("Нельзя создать чат с собой.")
         }
 
         val members = listOf(myUuid, otherUser.id)

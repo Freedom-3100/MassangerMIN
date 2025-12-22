@@ -17,7 +17,6 @@ interface AuthRepository {
 
 interface MessageRepository {
     val messages: StateFlow<List<ChatMessage>>
-
     fun observeMessages(): StateFlow<List<ChatMessage>>
     suspend fun sendMessage(text: String, userId: String)
     suspend fun loadMessages(): List<ChatMessage>

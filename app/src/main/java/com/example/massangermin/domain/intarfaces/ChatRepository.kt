@@ -12,7 +12,7 @@ interface ChatRepository {
     suspend fun getMessages(chatId: UUID): List<Message>
 
     suspend fun sendMessage(chatId: UUID, sender: UUID, text: String)
-    suspend fun getAllUsers(): List<User> // New function
+    suspend fun getAllUsers(): List<User>
 
     suspend fun addMemberToChat(chatId: UUID, email: String)
 

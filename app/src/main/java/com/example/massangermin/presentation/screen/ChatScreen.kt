@@ -74,13 +74,13 @@ private fun ChatListScreen(viewModel: ChatViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Chats") },
+                title = { Text("Чаты") },
                 actions = {
                     IconButton(onClick = { showCreateChatDialog = true }) {
-                        Icon(Icons.Default.Add, contentDescription = "New chat")
+                        Icon(Icons.Default.Add, contentDescription = "Новый чат")
                     }
                     IconButton(onClick = viewModel::signOut) {
-                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
+                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Выйти")
                     }
                 }
             )
@@ -137,12 +137,12 @@ private fun ChatDialogScreen(viewModel: ChatViewModel, chat: Chat) {
                 title = { Text(chatTitle(chat, currentUser, allUsers)) },
                 navigationIcon = {
                     IconButton(onClick = viewModel::clearSelectedChat) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
                     }
                 },
                 actions = {
                     IconButton(onClick = { showAddMemberDialog = true }) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Member")
+                        Icon(Icons.Default.Add, contentDescription = "Добавить участника")
                     }
                 }
             )
@@ -201,10 +201,10 @@ private fun MessageInput(
             value = text,
             onValueChange = onTextChange,
             modifier = Modifier.weight(1f),
-            placeholder = { Text("Message") }
+            placeholder = { Text("Сообщение") }
         )
         IconButton(onClick = onSend, enabled = text.isNotBlank()) {
-            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Отправить")
         }
     }
 }
@@ -244,21 +244,21 @@ private fun AddMemberDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Member") },
+        title = { Text("Добавить участника") },
         text = {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("User email") }
+                label = { Text("Email пользователя") }
             )
         },
         confirmButton = {
             Button(enabled = email.isNotBlank(), onClick = { onAdd(email.trim()) }) {
-                Text("Add")
+                Text("Добавить")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text("Назад") }
         }
     )
 }
@@ -276,7 +276,7 @@ private fun chatTitle(chat: Chat, currentUser: UserInfo?, allUsers: List<User>):
             return if (other != null && other.email != null) {
                 extractNameFromEmail(other.email)
             } else {
-                "Unknown User"
+                "Неизвестный пользователь"
             }
         }
         otherMembers.size > 1 -> {
@@ -287,7 +287,7 @@ private fun chatTitle(chat: Chat, currentUser: UserInfo?, allUsers: List<User>):
             otherUserNames.joinToString(", ")
         }
         else -> {
-            "Saved Messages"
+            "Сохранённые сообщения"
         }
     }
 }
@@ -313,7 +313,7 @@ private fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Login", style = MaterialTheme.typography.headlineMedium)
+        Text("Вход", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(24.dp))
 
         OutlinedTextField(
@@ -326,7 +326,7 @@ private fun LoginScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text("Пароль") },
             visualTransformation = PasswordVisualTransformation()
         )
         Spacer(Modifier.height(24.dp))
@@ -335,11 +335,11 @@ private fun LoginScreen(
             onClick = { viewModel.signIn(email.trim(), password) },
             enabled = email.isNotBlank() && password.isNotBlank()
         ) {
-            Text("Login")
+            Text("Вход")
         }
 
         TextButton(onClick = onNavigateToRegister) {
-            Text("Don't have an account? Sign Up")
+            Text("Нет аккаунта? Регистрируйтесь!")
         }
 
         when (userState) {
@@ -375,14 +375,14 @@ private fun RegisterScreen(
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
-            isError = userState is UserState.Error && (userState as UserState.Error).message?.contains("signUp") == true
+            isError = userState is UserState.Error && (userState as UserState.Error).message?.contains("signUP") == true
         )
         Spacer(Modifier.height(12.dp))
 
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text("Пароль") },
             visualTransformation = PasswordVisualTransformation()
         )
         Spacer(Modifier.height(12.dp))
@@ -390,7 +390,7 @@ private fun RegisterScreen(
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
+            label = { Text("Подтвердить пароль") },
             visualTransformation = PasswordVisualTransformation()
         )
         Spacer(Modifier.height(24.dp))
@@ -403,11 +403,11 @@ private fun RegisterScreen(
             },
             enabled = email.isNotBlank() && password.isNotBlank() && password == confirmPassword
         ) {
-            Text("Sign Up")
+            Text("Зарегистрироваться")
         }
 
         TextButton(onClick = onNavigateToLogin) {
-            Text("Already have an account? Sign In")
+            Text("Уже есть аккаунт? Входите!")
         }
 
         when (val state = userState) {
@@ -434,21 +434,21 @@ private fun CreateChatDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("New chat") },
+        title = { Text("Новый чат") },
         text = {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("User email") }
+                label = { Text("Email пользователя") }
             )
         },
         confirmButton = {
             Button(enabled = email.isNotBlank(), onClick = { onCreate(email.trim()) }) {
-                Text("Create")
+                Text("Создать")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text("Назал") }
         }
     )
 }
