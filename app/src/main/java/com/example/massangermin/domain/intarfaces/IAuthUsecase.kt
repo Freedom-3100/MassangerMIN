@@ -1,4 +1,4 @@
-package com.example.massangermin.domain
+package com.example.massangermin.domain.intarfaces
 
 import com.example.massangermin.data.model.UserState
 import io.github.jan.supabase.gotrue.user.UserInfo
@@ -10,5 +10,5 @@ interface AuthUseCase {
     suspend fun signIn(email: String, password: String)
     suspend fun signOut()
     fun observeCurrentUser(): Flow<UserInfo?>
-    val userState: StateFlow<UserState>  // ← ДОБАВИТЬ ЭТО!
+    val userState: StateFlow<UserState>  
 }

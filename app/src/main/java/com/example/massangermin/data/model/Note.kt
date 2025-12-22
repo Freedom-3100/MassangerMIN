@@ -6,6 +6,6 @@ import java.util.UUID
 
 @Serializable
 data class Note(
-    val id: String = UUID.randomUUID().toString(),  // нужно, чтобы decodeFromString мог создать объект
+    val id: String = UUID.randomUUID().toString(),
     val text: String
 )

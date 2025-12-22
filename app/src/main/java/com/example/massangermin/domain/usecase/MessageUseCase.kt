@@ -1,9 +1,9 @@
 package com.example.massangermin.domain.usecase
 
 import com.example.massangermin.data.model.ChatMessage
-import com.example.massangermin.domain.AuthRepository
-import com.example.massangermin.domain.MessageRepository
-import com.example.massangermin.domain.MessageUseCase
+import com.example.massangermin.domain.intarfaces.AuthRepository
+import com.example.massangermin.domain.intarfaces.MessageRepository
+import com.example.massangermin.domain.intarfaces.IMessageUseCase
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,7 +12,7 @@ import javax.inject.Singleton
 class MessageUseCaseImpl @Inject constructor(
     private val authRepository: AuthRepository,
     private val messageRepository: MessageRepository
-) : MessageUseCase {
+) : IMessageUseCase {
 
     override suspend fun sendMessage(text: String) {
         try {

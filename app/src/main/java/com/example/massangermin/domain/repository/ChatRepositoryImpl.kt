@@ -1,26 +1,22 @@
-package com.example.massangermin.data.repository
+package com.example.massangermin.domain.repository
 
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.massangermin.data.model.Chat
 import com.example.massangermin.data.model.Message
 import com.example.massangermin.data.model.User
-import com.example.massangermin.data.network.SupabaseClientHolder
-import com.example.massangermin.domain.ChatRepository
+import com.example.massangermin.domain.network.SupabaseClientHolder
+import com.example.massangermin.domain.intarfaces.ChatRepository
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
-import io.github.jan.supabase.realtime.PostgresAction
-import io.github.jan.supabase.realtime.channel
-import io.github.jan.supabase.realtime.realtime
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
+import java.time.Instant
 
 class ChatRepositoryImpl @Inject constructor() : ChatRepository {
 
@@ -85,12 +81,12 @@ class ChatRepositoryImpl @Inject constructor() : ChatRepository {
             chat_id = chatId,
             sender = sender,
             text = text,
-            created_at = java.time.Instant.now().toString()
+            created_at = Instant.now().toString()
         )
 
         SupabaseClientHolder.client
             .from("all_messages")
-            .insert(listOf(message)) // обязательно список
+            .insert(listOf(message))
     }
 
 
@@ -147,13 +143,12 @@ class ChatRepositoryImpl @Inject constructor() : ChatRepository {
 
             emit(messages)
 
-            delay(1500) // 1.5 секунды
+            delay(1500)
         }
     }
 
     override suspend fun createPrivateChatByEmail(email: String): UUID {
 
-        // 1. найти пользователя по email
         val otherUser = SupabaseClientHolder.client
             .from("profiles")
             .select {
@@ -162,7 +157,6 @@ class ChatRepositoryImpl @Inject constructor() : ChatRepository {
             .decodeSingleOrNull<User>()
             ?: throw IllegalStateException("Пользователь не найден")
 
-        // 2. текущий пользователь
         val currentUserId = SupabaseClientHolder.client
             .auth
             .currentUserOrNull()
@@ -178,7 +172,6 @@ class ChatRepositoryImpl @Inject constructor() : ChatRepository {
         val members = listOf(myUuid, otherUser.id)
             .sortedBy { it.toString() }
 
-        // 3. проверить существующий чат
         val existingChat = SupabaseClientHolder.client
             .from("chats")
             .select()
@@ -191,7 +184,6 @@ class ChatRepositoryImpl @Inject constructor() : ChatRepository {
             return existingChat.id
         }
 
-        // 4. создать чат
         val chat = Chat(members = members)
         SupabaseClientHolder.client.from("chats").insert(chat)
 

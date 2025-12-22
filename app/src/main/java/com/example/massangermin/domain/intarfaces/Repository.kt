@@ -1,4 +1,4 @@
-package com.example.massangermin.domain
+package com.example.massangermin.domain.intarfaces
 
 import com.example.massangermin.data.model.ChatMessage
 import com.example.massangermin.data.model.UserState

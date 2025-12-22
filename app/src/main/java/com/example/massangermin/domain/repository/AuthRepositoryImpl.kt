@@ -1,7 +1,7 @@
-package com.example.massangermin.data.repository
+package com.example.massangermin.domain.repository
 
-import com.example.massangermin.domain.AuthRepository
-import com.example.massangermin.data.network.SupabaseClientHolder
+import com.example.massangermin.domain.intarfaces.AuthRepository
+import com.example.massangermin.domain.network.SupabaseClientHolder
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.user.UserInfo

@@ -1,4 +1,4 @@
-package com.example.massangermin.data.network
+package com.example.massangermin.domain.network
 
 import com.example.massangermin.BuildConfig
 import io.github.jan.supabase.SupabaseClient

@@ -1,11 +1,10 @@
-// AppModule.kt
 package com.example.massangermin.di
 
-import com.example.massangermin.data.repository.AuthRepositoryImpl
-import com.example.massangermin.data.repository.ChatRepositoryImpl
-import com.example.massangermin.domain.AuthRepository
-import com.example.massangermin.domain.AuthUseCase
-import com.example.massangermin.domain.ChatRepository
+import com.example.massangermin.domain.repository.AuthRepositoryImpl
+import com.example.massangermin.domain.repository.ChatRepositoryImpl
+import com.example.massangermin.domain.intarfaces.AuthRepository
+import com.example.massangermin.domain.intarfaces.AuthUseCase
+import com.example.massangermin.domain.intarfaces.ChatRepository
 import com.example.massangermin.domain.usecase.AuthUseCaseImpl
 import dagger.Module
 import dagger.Provides
@@ -17,7 +16,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    // ============ REPOSITORIES ============
 
     @Provides
     @Singleton
@@ -31,7 +29,6 @@ object AppModule {
         return ChatRepositoryImpl()
     }
 
-    // ============ USECASES ============
 
     @Provides
     @Singleton

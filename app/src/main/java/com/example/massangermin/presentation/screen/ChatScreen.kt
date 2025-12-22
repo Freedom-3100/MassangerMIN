@@ -25,7 +25,6 @@ import com.example.massangermin.data.model.UserState
 import com.example.massangermin.presentation.viewmodel.ChatViewModel
 import io.github.jan.supabase.gotrue.user.UserInfo
 
-/* ========================= ROOT ========================= */
 
 @Composable
 fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
@@ -52,7 +51,6 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
     }
 }
 
-/* ========================= HOST ========================= */
 
 @Composable
 private fun ChatHost(viewModel: ChatViewModel) {
@@ -63,8 +61,6 @@ private fun ChatHost(viewModel: ChatViewModel) {
     } ?: ChatListScreen(viewModel)
 }
 
-
-/* ========================= CHAT LIST ========================= */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,7 +112,6 @@ private fun ChatListScreen(viewModel: ChatViewModel) {
     }
 }
 
-/* ========================= CHAT DIALOG ========================= */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -189,7 +184,6 @@ private fun ChatDialogScreen(viewModel: ChatViewModel, chat: Chat) {
     }
 }
 
-/* ========================= COMPONENTS ========================= */
 
 @Composable
 private fun MessageInput(
@@ -241,8 +235,6 @@ private fun MessageBubble(message: Message, isMine: Boolean) {
     }
 }
 
-/* ========================= ADD MEMBER DIALOG ========================= */
-
 @Composable
 private fun AddMemberDialog(
     onDismiss: () -> Unit,
@@ -270,8 +262,6 @@ private fun AddMemberDialog(
         }
     )
 }
-
-/* ========================= HELPERS ========================= */
 
 private fun chatTitle(chat: Chat, currentUser: UserInfo?, allUsers: List<User>): String {
 
@@ -306,7 +296,6 @@ private fun extractNameFromEmail(email: String): String {
     return email.substringBefore('@').takeIf { it.isNotEmpty() } ?: email
 }
 
-/* ========================= LOGIN ========================= */
 
 @Composable
 private fun LoginScreen(
@@ -360,8 +349,6 @@ private fun LoginScreen(
         }
     }
 }
-
-/* ========================= REGISTER ========================= */
 
 @Composable
 private fun RegisterScreen(
@@ -437,7 +424,6 @@ private fun RegisterScreen(
     }
 }
 
-/* ========================= CREATE CHAT ========================= */
 
 @Composable
 private fun CreateChatDialog(

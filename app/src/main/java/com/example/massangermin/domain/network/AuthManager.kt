@@ -1,13 +1,12 @@
-package com.example.massangermin.data.network
+package com.example.massangermin.domain.network
 
-import com.example.massangermin.data.network.SupabaseClientHolder.client
+import com.example.massangermin.domain.network.SupabaseClientHolder.client
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 
 
 object AuthManager {
 
-    // --- Sign Up ---
     suspend fun signUp(email: String, password: String): Boolean {
         return try {
             val config: Email.Config.() -> Unit = {
@@ -22,7 +21,6 @@ object AuthManager {
         }
     }
 
-    // --- Sign In ---
     suspend fun signIn(email: String, password: String): Boolean {
         return try {
             val config: Email.Config.() -> Unit = {
@@ -37,11 +35,9 @@ object AuthManager {
         }
     }
 
-    // --- Sign Out ---
     suspend fun signOut() {
         client.auth.signOut()
     }
 
-    // --- Current User ---
     fun currentUser() = client.auth.currentUserOrNull()
 }

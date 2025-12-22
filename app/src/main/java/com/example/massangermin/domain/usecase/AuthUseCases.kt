@@ -1,8 +1,8 @@
 package com.example.massangermin.domain.usecase
 
 import com.example.massangermin.data.model.UserState
-import com.example.massangermin.domain.AuthRepository
-import com.example.massangermin.domain.AuthUseCase
+import com.example.massangermin.domain.intarfaces.AuthRepository
+import com.example.massangermin.domain.intarfaces.AuthUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +18,7 @@ class AuthUseCaseImpl @Inject constructor(
     override val userState: StateFlow<UserState> = _userState.asStateFlow()
 
     override suspend fun signUp(email: String, password: String) {
+
         _userState.value = UserState.Loading
 
         try {
@@ -31,6 +32,7 @@ class AuthUseCaseImpl @Inject constructor(
     }
 
     override suspend fun signIn(email: String, password: String) {
+
         _userState.value = UserState.Loading
 
         try {
@@ -45,10 +47,8 @@ class AuthUseCaseImpl @Inject constructor(
 
     override suspend fun signOut() {
         try {
-            // Выходим из аккаунта
             authRepository.signOut()
 
-            // Обновляем состояние
             _userState.value = UserState.Success("You signed out.")
 
         } catch (e: Exception) {

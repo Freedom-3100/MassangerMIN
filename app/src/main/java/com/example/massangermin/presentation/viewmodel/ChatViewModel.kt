@@ -7,8 +7,8 @@ import com.example.massangermin.data.model.Chat
 import com.example.massangermin.data.model.Message
 import com.example.massangermin.data.model.User
 import com.example.massangermin.data.model.UserState
-import com.example.massangermin.domain.AuthUseCase
-import com.example.massangermin.domain.ChatRepository
+import com.example.massangermin.domain.intarfaces.AuthUseCase
+import com.example.massangermin.domain.intarfaces.ChatRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -24,15 +24,12 @@ class ChatViewModel @Inject constructor(
     private val chatRepository: ChatRepository
 ) : ViewModel() {
 
-    /* ========================= AUTH ========================= */
-
     val currentUser = authUseCase.observeCurrentUser()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val userState = authUseCase.userState
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UserState.Idle)
 
-    /* ========================= STATE ========================= */
 
     private val _chats = MutableStateFlow<List<Chat>>(emptyList())
     val chats = _chats.asStateFlow()
@@ -52,7 +49,6 @@ class ChatViewModel @Inject constructor(
 
     private var messagesJob: Job? = null
 
-    /* ========================= INIT ========================= */
 
     init {
 
@@ -74,8 +70,6 @@ class ChatViewModel @Inject constructor(
         _messages.value = emptyList()
         messagesJob?.cancel()
     }
-
-    /* ========================= CHATS ========================= */
 
     private fun loadChats() {
         val userId = currentUser.value?.id ?: return
@@ -109,7 +103,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    /* ========================= CREATE CHAT ========================= */
 
     fun createChat(friendIds: List<UUID>) {
         val currentUserId = currentUser.value?.id ?: return
@@ -138,7 +131,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    /* ========================= MESSAGES ========================= */
 
     fun sendMessage(text: String) {
         val chatId = _selectedChatId.value ?: return
@@ -157,8 +149,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    /* ========================= MEMBERS ========================= */
-
     fun addMemberToChat(friendEmail: String) {
         val chatId = _selectedChatId.value ?: return
 
@@ -173,7 +163,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    /* ========================= USERS ========================= */
 
     private fun loadAllUsers() {
         viewModelScope.launch {
@@ -184,8 +173,6 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
-
-    /* ========================= AUTH ========================= */
 
     fun signUp(email: String, password: String) {
         viewModelScope.launch { authUseCase.signUp(email, password) }
